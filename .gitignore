@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+.env
+data/*.pkl
+data/*.geojson
+results/*
+!results/.gitkeep
+.osmnx_cache/
+venv/
+.DS_Store
+pytest_cache/
+.coverage
