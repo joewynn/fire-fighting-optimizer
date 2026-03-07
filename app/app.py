@@ -33,7 +33,14 @@ if run_btn:
             G = get_edmonton_graph()
             demands = generate_demand_points(G, n_points=300)
             all_nodes = list(G.nodes)
-            candidate_nodes = np.random.choice(all_nodes, size=20, replace=False).tolist()
+          
+            # ✅ SAFE SAMPLING: Don't ask for more candidates than nodes available
+            num_candidates = min(100, len(all_nodes))
+            if num_candidates < 5:
+                st.error(f"Road network too small ({len(all_nodes)} nodes). Try expanding the bounding box.")
+                st.stop()
+            
+            candidate_nodes = np.random.choice(all_nodes, size=num_candidates, replace=False).tolist()
 
             if 'travel_matrix' not in st.session_state or st.session_state.get('candidates_hash') != hash(tuple(candidate_nodes)):
                 st.session_state.travel_matrix = compute_travel_matrix(G, candidate_nodes, demands)
@@ -52,13 +59,18 @@ if run_btn:
                 show_baseline=compare_baseline, baseline_stations=baseline_gdf
             )
 
+            # ... inside if run_btn: ...
+            
             st.session_state.results = {
                 'metrics': metrics,
                 'map': map_obj,
-                'selected_indices': selected_indices,
-                'candidate_nodes': candidate_nodes,
-                'baseline_gdf': baseline_gdf
+                'selected_count': len(selected_indices),
+                'baseline_gdf': baseline_gdf,
+                # ✅ CRITICAL: Save these for the download block to use later
+                'selected_indices': selected_indices, 
+                'candidate_nodes': candidate_nodes
             }
+
         except Exception as e:
             st.error(f"Optimization failed: {str(e)}")
 
@@ -75,9 +87,10 @@ if st.session_state.results:
     st.subheader("Geospatial Deployment Strategy")
     st_folium(res['map'], width=1200, height=600)
 
-    # FIXED: Download buttons (now crash-proof + actually exports optimized stations)
+    # ✅ FIXED DOWNLOAD SECTION – Robust & Statelessness-Compliant
     st.divider()
     colA, colB = st.columns(2)
+
     with colA:
         html_data = res['map']._repr_html_()
         st.download_button(
@@ -86,32 +99,59 @@ if st.session_state.results:
             file_name="edmonton_fire_optimizer_map.html",
             mime="text/html"
         )
+
     with colB:
-        # Build GeoDataFrame of optimized stations
+        # ✅ ROBUST: Reload G here. It hits the disk cache, so it's instant (<0.1s).
+        G = get_edmonton_graph()
+        
+        # Retrieve saved indices from session state
+        selected_indices = res.get('selected_indices', [])
+        candidate_nodes = res.get('candidate_nodes', [])
+
+        # Build GeoDataFrame of optimized stations dynamically
         opt_data = []
-        for idx in res['selected_indices']:
-            node = res['candidate_nodes'][idx]
-            x, y = G.nodes[node]['x'], G.nodes[node]['y']  # G is not in session_state, but we can recreate coords here
-            opt_data.append({'station_type': 'Optimized', 'geometry': gpd.points_from_xy([x], [y])[0]})
+        for idx in selected_indices:
+            # Safety check in case of index mismatch
+            if idx < len(candidate_nodes):
+                node = candidate_nodes[idx]
+                x = G.nodes[node]['x']
+                y = G.nodes[node]['y']
+                opt_data.append({
+                    'station_type': 'Optimized_New',
+                    'geometry': gpd.points_from_xy([x], [y])[0]
+                })
+
         opt_gdf = gpd.GeoDataFrame(opt_data, crs="EPSG:4326") if opt_data else None
 
         # Combine with baseline if present
-        if res['baseline_gdf'] is not None and opt_gdf is not None:
-            combined = pd.concat([res['baseline_gdf'].assign(station_type='Current'), opt_gdf], ignore_index=True)
+        if res.get('baseline_gdf') is not None and opt_gdf is not None:
+            combined = pd.concat([
+                res['baseline_gdf'].assign(station_type='Current_Existing'),
+                opt_gdf
+            ], ignore_index=True)
             geojson_data = combined.to_json()
             file_name = "optimized_plus_current_stations.geojson"
-            label = "📥 Download Optimized + Current Stations (GeoJSON for QGIS)"
+            label = "📥 Download Optimized + Current (GeoJSON)"
         elif opt_gdf is not None:
             geojson_data = opt_gdf.to_json()
             file_name = "optimized_stations.geojson"
-            label = "📥 Download Optimized Stations (GeoJSON for QGIS)"
-        else:
+            label = "📥 Download Optimized Stations (GeoJSON)"
+        elif res.get('baseline_gdf') is not None:
             geojson_data = res['baseline_gdf'].to_json()
             file_name = "current_stations_baseline.geojson"
-            label = "📥 Download Current Stations (GeoJSON for QGIS)"
+            label = "📥 Download Current Stations (GeoJSON)"
+        else:
+            # Fallback if nothing exists
+            geojson_data = "{}"
+            file_name = "empty_export.geojson"
+            label = "📥 No Data to Export"
 
-        st.download_button(label=label, data=geojson_data, file_name=file_name, mime="application/json")
-
+        st.download_button(
+            label=label,
+            data=geojson_data,
+            file_name=file_name,
+            mime="application/json"
+        )
     st.info("""
     **Interpretation for Leadership:**  
     Red = new optimized stations (MCLP). Blue = current EFRS stations.  

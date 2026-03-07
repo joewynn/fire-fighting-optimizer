@@ -12,23 +12,46 @@ ox.settings.log_console = False
 def get_edmonton_graph():
     """Downloads and caches the Edmonton road network."""
     cache_path = "data/edmonton_graph.pkl"
+   
+    # Check cache first
     if os.path.exists(cache_path):
-        with open(cache_path, 'rb') as f:
-            return pickle.load(f)
-    
+        try:
+            with open(cache_path, 'rb') as f:
+                G = pickle.load(f)
+                # Verify graph has edges before returning cached version
+                if len(G.edges) > 0:
+                    return G
+                else:
+                    print("Cached graph is empty. Re-downloading...")
+                    os.remove(cache_path)
+        except Exception:
+            print("Cache corrupted. Re-downloading...")
+            if os.path.exists(cache_path): os.remove(cache_path)
     print("Downloading Edmonton road network (this may take a minute)...")
-    # Bounding box for Edmonton + Sherwood Park + St. Albert
-    G = ox.graph_from_bbox(
-        north=53.65, south=53.40, east=-113.30, west=-113.70,
-        network_type='drive', simplify=True
-    )
-    G = ox.add_edge_speeds(G)
-    G = ox.add_edge_travel_times(G)
-    
-    os.makedirs("data", exist_ok=True)
-    with open(cache_path, 'wb') as f:
-        pickle.dump(G, f)
-    return G
+   
+    try:
+        # ✅ ROBUST METHOD: Use Place Name instead of BBox
+        # This automatically handles the correct bounding box internally
+        G = ox.graph_from_place("Edmonton, Alberta, Canada", network_type='drive', simplify=True)
+       
+        # Add speed and travel time attributes
+        G = ox.add_edge_speeds(G)
+        G = ox.add_edge_travel_times(G)
+       
+        # Final safety check
+        if len(G.edges) == 0:
+            raise ValueError("Downloaded graph has no edges. Check network_type or place name.")
+        print(f"Success! Downloaded {len(G.nodes)} nodes and {len(G.edges)} edges.")
+       
+        os.makedirs("data", exist_ok=True)
+        with open(cache_path, 'wb') as f:
+            pickle.dump(G, f)
+           
+        return G
+       
+    except Exception as e:
+        print(f"Error downloading graph: {e}")
+        raise e
 
 def load_real_stations():
     """Loads actual EFRS station locations from Edmonton Open Data."""

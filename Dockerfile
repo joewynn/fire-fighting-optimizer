@@ -26,12 +26,18 @@ COPY . .
 # Create directories for runtime data
 RUN mkdir -p data results
 
+# ✅ FIX: Add src and app folders to Python path
+ENV PYTHONPATH=/app:/app/src:/app/app
+
 # Expose Streamlit Port
 EXPOSE 8501
+
 
 # Healthcheck (Optional but professional)
 HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8501/_stcore/health || exit 1
 
 # Run Command
-CMD ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0", "--server.headless=true"]
+# CMD ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0", "--server.headless=true"]
+
+CMD ["streamlit", "run", "app/app.py", "--server.port=8501", "--server.address=0.0.0.0", "--server.headless=true"]
