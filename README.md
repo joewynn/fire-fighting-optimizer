@@ -11,6 +11,27 @@
 
 ---
 
+## 📋 Executive Summary
+
+> **🚨 The Problem**
+>
+>Traditional planning optimizes for the average. But in emergency services, **the average is a big risk**. If we optimize for the mean, we leave the furthest citizen vulnerable. This project's goal is to minimize the **90th Percentile Response Time** while maintaining **Probability of Availability (PoA)** during peak stress.
+>
+> **⚙️ The Method**
+>
+> This project builds a **Two-Stage Hybrid Model**:
+>
+> * **Stage 1 (Exact Optimization):** First, solve the **Maximal Covering Location Problem (MCLP)** using MILP (PuLP/Gurobi-compatible) to find the theoretical best spots for new stations in Edmonton, ensuring we hit the highest risk zones first.
+> * **Stage 2 (Resilience Stress-Test):** Second, consider that trucks get busy. So, we wrap that solution in a **Monte Carlo simulation engine** (metaheuristic approach). It simulates thousands of scenarios where 30% of the fleet is unavailable, 'evolving' the station locations to find a configuration that remains robust even when the system is under chaos.
+>
+> **🏆 The Result**
+>
+>The output is more than just a list of station coordinates. It is an **interactive, boardroom-ready dashboard** demonstrating **Fractal Coverage**—showing how our new plan eliminates blind spots in suburbs and industrial zones. This moves from a static map to a **resilient strategy** that guarantees service levels even on the worst nights.
+>
+> **💡 Why This Matters**
+>
+>This approach balances **theoretical rigor** (proven optimality) with **practical implementation** (handling real-world uncertainty). It allows leadership to make **defensible, data-driven investments** that directly save lives.
+
 ## 🎯 Project Purpose & Business Meaning
 
 ### **What this project does**
@@ -18,6 +39,8 @@
 This is a **demonstration** shows how to optimize fire emergency resource allocation across a real Canadian city (Edmonton, Alberta).  
 
 It solves the problem of optimizing fire stations placements in a city plus its surburb, with a specific example of Edmonton City in Alberta Canada.
+
+**Objective**: Re-allocate a limited fleet of 15 new "Rapid Response Units" across Edmonton and its growing suburbs (e.g., Sherwood Park, St. Albert, Leduc) to maximize coverage of high-risk zones while ensuring resilience during peak busy periods.
 
 The question it tries to answer is:
 
