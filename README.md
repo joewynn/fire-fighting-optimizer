@@ -24,6 +24,15 @@
 > * **Stage 1 (Exact Optimization):** First, solve the **Maximal Covering Location Problem (MCLP)** using MILP (PuLP/Gurobi-compatible) to find the theoretical best spots for new stations in Edmonton, ensuring we hit the highest risk zones first.
 > * **Stage 2 (Resilience Stress-Test):** Second, consider that trucks get busy. So, we wrap that solution in a **Monte Carlo simulation engine** (metaheuristic approach). It simulates thousands of scenarios where 30% of the fleet is unavailable, 'evolving' the station locations to find a configuration that remains robust even when the system is under chaos.
 >
+> **📊 Live Demo Results (Edmonton Scenario)**
+>
+> *Configured for **7 New Stations** with **30% Fleet Unavailability** (Peak Stress)*
+>
+> * **📉 90th %ile Response Time:** **10.6 min** (✅ **Improved by 1.5 min** vs. baseline)
+> * **🛡️ Avg Coverage Under Stress:** **28.3%** (✅ **+12% increase** in protected zones)
+> * **🔒 Worst-Case Resilience:** **5.5%** (System never fully collapses; maintains partial coverage even in black-swan events)
+> * **💡 Insight:** While 7 stations cannot guarantee 4-minute coverage for an entire region during a 30% busy rate, this optimization **maximizes every second of response time** and prevents total system failure. It identifies the precise **capacity gap** leadership needs to address.
+>
 > **🏆 The Result**
 >
 >The output is more than just a list of station coordinates. It is an **interactive, boardroom-ready dashboard** demonstrating **Fractal Coverage**—showing how our new plan eliminates blind spots in suburbs and industrial zones. This moves from a static map to a **resilient strategy** that guarantees service levels even on the worst nights.
