@@ -10,3 +10,4 @@ venv/
 .DS_Store
 pytest_cache/
 .coverage
+docs/LocalDoc.md

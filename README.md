@@ -1,6 +1,7 @@
 # 🚒 Edmonton Fire Resource Optimizer
 
-**Darkhorse Emergency – Senior Data Scientist Portfolio Demo**  
+**Fight Fighting Emergency – Senior Data Scientist Portfolio Demo**  
+
 *Real-world two-stage optimization for fire station placement in Edmonton + suburbs*
 
 [![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)](https://www.docker.com/)
@@ -67,9 +68,8 @@ This demo proves you can translate advanced mathematics (MILP + metaheuristics) 
 
 ```bash
 # 1. Clone the repo
-git clone https://github.com/YOUR_USERNAME/edmonton-fire-optimizer.git
-cd edmonton-fire-optimizer
-
+git clone https://github.com/YOUR_USERNAME/fire-fighting-optimizer.git
+cd fire-fighting-optimizer
 # 2. Start the app
 docker compose up --build
 ```
@@ -90,8 +90,8 @@ streamlit run app/app.py
 ### 1. Clone & Install
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/edmonton-fire-optimizer.git
-cd edmonton-fire-optimizer
+git clone https://github.com/YOUR_USERNAMEfire-fighting-optimizer.git
+cd fire-fighting-optimizer
 ```
 
 ### 2. Run Tests (TDD – runs in < 3 seconds)
@@ -122,8 +122,8 @@ The first run downloads + caches the Edmonton road network (~60 seconds). Subseq
 sudo apt update && sudo apt upgrade -y
 curl -fsSL https://get.docker.com -o get-docker.sh && sudo sh get-docker.sh
 sudo usermod -aG docker $USER   # log out & back in
-git clone https://github.com/YOUR_USERNAME/edmonton-fire-optimizer.git
-cd edmonton-fire-optimizer
+git clone https://github.com/YOUR_USERNAME/fire-fighting-optimizer.git
+cd fire-fighting-optimizer
 docker compose up -d --build
 ```
 
@@ -188,7 +188,7 @@ You now have a **portfolio piece** that looks and feels like a real product — 
 Want a version with screenshots embedded (once you run it) or a GitHub README template link? Just let me know!
 
 ```txt
-edmonton-fire-optimizer/
+fire-fighting-optimizer/
 ├── .gitignore
 ├── README.md
 ├── requirements.txt
@@ -216,9 +216,9 @@ edmonton-fire-optimizer/
 ```bash
 git init
 git add .
-git commit -m "Initial commit: Darkhorse-ready Fire Optimizer"
+git commit -m "Initial commit: Fire Optimizer-ready Fire Optimizer"
 git branch -M main
-git remote add origin https://github.com/YOUR_USERNAME/edmonton-fire-optimizer.git
+git remote add origin https://github.com/YOUR_USERNAME/fire-fighting-optimizer.git
 git push -u origin main
 
 ```
@@ -234,8 +234,8 @@ sudo usermod -aG docker $USER
 # LOG OUT AND LOG BACK IN HERE
 
 # 2. Clone Repo
-git clone https://github.com/YOUR_USERNAME/edmonton-fire-optimizer.git
-cd edmonton-fire-optimizer
+git clone https://github.com/YOUR_USERNAME/fire-fighting-optimizer.git
+cd fire-fighting-optimizer
 
 # 3. Run Tests (CI Check)
 docker compose run --rm fire-optimizer pytest
@@ -260,7 +260,7 @@ Access: `http://<YOUR_ORACLE_IP>:8501`
 docker compose down
 
 # 2. Remove the old image (force rebuild)
-docker rmi edmonton-fire-optimizer-fire-optimizer 2>/dev/null || true
+docker rmi fire-fighting-optimizer-fire-optimizer 2>/dev/null || true
 
 # 3. Clean local Python cache (on your host machine)
 find . -type d -name __pycache__ -exec rm -r {} +
